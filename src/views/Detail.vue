@@ -21,52 +21,82 @@
       <div class="detail-info__item">Delivery</div>
       <div class="detail-info__item">WH:Receipts</div>
     </div>
+    <div class="my-3 px-3 position-relative">
+      <i class="fas fa-search text-muted position-center"></i>
+      <input type="search" class="w-25 input-search pl-5" placeholder="Some Input Text" name id />
+    </div>
+    <div class="container-fluid bg-light">
+      <b-alert
+        :show="dismissCountDown"
+        dismissible
+        fade
+        variant="danger"
+        @dismiss-count-down="countDownChanged"
+        class="fixed-top"
+      >Only can add 3 section</b-alert>
+      <div class="container">
+        <div class="list">
+          <div class="list-info py-2">
+            <div class="list-info__id p-5">1</div>
+            <div class="list-info__image justify-content-center d-flex px-2">
+              <img
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSmrQPqF9mu8n26drpKzmzrefHldBo8HPkduw&usqp=CAU"
+                alt
+              />
+            </div>
+            <div class="list-info__content px-3">
+              <div class="label">Name:</div>
+              <div class="content">Avcvwawvawe</div>
+              <div class="label">So luong:</div>
+              <div class="content">12</div>
+            </div>
+            <div class="list-info__btnGroup px-5 border-left border-right text-center">
+              <b-button variant="success d-block my-2 mx-auto" @click="handleAdd">Add</b-button>
+              <b-button variant="outline-primary">Print QR</b-button>
+            </div>
+          </div>
 
-    <div class="container">
-      <div class="mt-5 mb-3 px-3 position-relative">
-        <i class="fas fa-search text-muted position-center"></i>
-        <input type="search" class="w-25 input-search pl-5" placeholder="Some Input Text" name id />
-      </div>
-      <div class="list">
-        <div class="list-info py-2">
-          <div class="list-info__id p-5">1</div>
-          <div class="list-info__image justify-content-center d-flex px-2">
-            <img
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSmrQPqF9mu8n26drpKzmzrefHldBo8HPkduw&usqp=CAU"
-              alt
-            />
-          </div>
-          <div class="list-info__content px-3">
-            <div class="label">Name:</div>
-            <div class="content">Avcvwawvawe</div>
-            <div class="label">So luong:</div>
-            <div class="content">12</div>
-          </div>
-          <div class="list-info__btnGroup px-5 border-left border-right text-center">
-            <b-button variant="success d-block my-2">Add</b-button>
-            <b-button variant="outline-danger">Print QR</b-button>
-          </div>
+          <b-table
+            hover
+            bordered
+            fixed
+            :items="dataSource"
+            :fields="fields"
+            :head-variant="headVariant"
+            show-empty
+            responsive
+          >
+            <template v-slot:empty="scope" >
+              <div class="text-center h1 py-5 text-black-50">
+                <div>
+                  <i class="fas fa-box-open"></i>
+                </div>
+                <div>{{ scope.emptyText }}</div>
+              </div>
+            </template>
+            <template v-slot:cell(image)="data">
+              <img :src="data.value" alt />
+            </template>
+
+            <template v-slot:cell(so_luong_nhap)="data">
+              <div>Da in: {{data.value.success}}</div>
+              <div>Loi: {{data.value.failed}}</div>
+            </template>
+
+            <template v-slot:cell(print)="data">
+              <b-button variant="primary">{{data.field.label}}</b-button>
+            </template>
+            <template v-slot:cell(action)="data">
+              <b-button variant="outline-info mr-2" class="" >
+                <i class="far fa-edit"></i>
+              </b-button>
+              <b-button variant="danger" @click="handleDelete(data.item.key)">
+                <i class="fas fa-trash"></i>
+              </b-button>
+            </template>
+          </b-table>
         </div>
       </div>
-      <b-table hover fixed :items="items" :fields="fields" :head-variant="headVariant" responsive>
-        <template v-slot:cell(image)="data">
-          <img :src="data.value" alt />
-        </template>
-
-        <template v-slot:cell(so_luong_nhap)="data">
-          <p>Da in: {{data.value.success}}</p>
-          <p>Loi: {{data.value.failed}}</p>
-        </template>
-
-        <template v-slot:cell(print)="data">
-          <b-button variant="primary">{{data.field.label}}</b-button>
-        </template>
-        <template v-slot:cell(action)="data">
-          <div :class="data.field.label"></div>
-          <b-button variant="success">Add</b-button>
-          <b-button variant="outline-danger">Delete</b-button>
-        </template>
-      </b-table>
     </div>
   </div>
 </template>
@@ -84,17 +114,56 @@ export default {
         { key: "lot_date" },
         { key: "ngay_san_xuat" },
         { key: "ngay_het_han" },
+        { key: "action", tdClass: 'text-center' },
       ],
 
-      items: [
+      dataSource: [
         {
-          so_luong: 40,
+          key: 1,
+          so_luong: 1,
+          so_luong_nhap: { success: 9, failed: 3 },
+        },
+        {
+          key: 2,
+          so_luong: 2,
           so_luong_nhap: { success: 9, failed: 3 },
         },
       ],
-      headVariant: "none",
-      fixed: true,
+      headVariant: "light",
+      dismissSecs: 1,
+      dismissCountDown: 0,
     };
+  },
+
+  methods: {
+    // handleDelete(key) {
+    //   const dataSource = [...this.dataSource];
+    //   this.dataSource = dataSource.filter((item) => item.key !== key);
+    // },
+    countDownChanged(dismissCountDown) {
+      this.dismissCountDown = dismissCountDown;
+    },
+    handleAdd() {
+      const { dataSource } = this;
+      if (dataSource.length < 3) {
+        const newData = {
+          key: dataSource.length + 1,
+          so_luong: dataSource.length + 2,
+          so_luong_nhap: { success: 9, failed: 3 },
+        };
+        this.dataSource = [...dataSource, newData];
+      } else {
+        this.dismissCountDown = this.dismissSecs;
+      }
+    },
+    handleDelete(key) {
+      this.$bvModal.msgBoxConfirm("Are you sure?").then((value) => {
+        if (value) {
+          const dataSource = [...this.dataSource];
+          this.dataSource = dataSource.filter((item) => item.key !== key);
+        }
+      });
+    },
   },
 };
 </script>
@@ -153,6 +222,8 @@ export default {
 }
 
 .list {
+  border-bottom: 1px solid #d3d3d3;
+  padding: 1em 0;
   .list-info {
     display: grid;
     grid-template-columns: auto auto 1fr auto;
