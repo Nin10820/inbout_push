@@ -1,16 +1,16 @@
 import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
-import Antd from 'ant-design-vue';
-
 
 // Bootstrap
 import 'bootstrap'
 import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap-vue/dist/bootstrap-vue.css'
 
-import 'ant-design-vue/dist/antd.css';
-Vue.use(Antd);
-
+//Fontawesome
+import '@fortawesome/fontawesome-free/css/all.css'
+import '@fortawesome/fontawesome-free/js/all.js'
 
 Vue.config.productionTip = false
 

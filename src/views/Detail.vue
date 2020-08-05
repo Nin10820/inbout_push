@@ -1,11 +1,12 @@
 <template>
-  <div class="home">
+  <div class="detail">
     <div class="nav container-fluid p-3">
-      <router-link to="/" class="btn btn-outline-secondary">
-        <i class="fas fa-chevron-left pr-2"></i>Back to home
+      <router-link to="/" class="btn">
+        <i class="fas fa-chevron-left"></i>
       </router-link>
+      <div class="logo">Inbound</div>
     </div>
-    <div class="detail-info py-3 px-5">
+    <div class="detail-info">
       <div class="detail-info__item pr-5">PO123456</div>
       <div class="detail-info__item">Vendor</div>
       <div
@@ -21,149 +22,105 @@
       <div class="detail-info__item">WH:Receipts</div>
     </div>
 
-    <div class="pt-5 pb-3 px-3">
-      <a-input-search placeholder="input search text" style="width: 200px" />
-      <a-button class="float-right" type="primary">Button</a-button>
-    </div>
-    <a-button class type="primary" @click="handleAdd">add</a-button>
+    <div class="container">
+      <div class="mt-5 mb-3 px-3 position-relative">
+        <i class="fas fa-search text-muted position-center"></i>
+        <input type="search" class="w-25 input-search pl-5" placeholder="Some Input Text" name id />
+      </div>
+      <div class="list">
+        <div class="list-info py-2">
+          <div class="list-info__id p-5">1</div>
+          <div class="list-info__image justify-content-center d-flex px-2">
+            <img
+              src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSmrQPqF9mu8n26drpKzmzrefHldBo8HPkduw&usqp=CAU"
+              alt
+            />
+          </div>
+          <div class="list-info__content px-3">
+            <div class="label">Name:</div>
+            <div class="content">Avcvwawvawe</div>
+            <div class="label">So luong:</div>
+            <div class="content">12</div>
+          </div>
+          <div class="list-info__btnGroup px-5 border-left border-right text-center">
+            <b-button variant="success d-block my-2">Add</b-button>
+            <b-button variant="outline-danger">Print QR</b-button>
+          </div>
+        </div>
+      </div>
+      <b-table hover fixed :items="items" :fields="fields" :head-variant="headVariant" responsive>
+        <template v-slot:cell(image)="data">
+          <img :src="data.value" alt />
+        </template>
 
-    <a-table :columns="columns" :data-source="dataSource" bordered>
-      <template slot="name" slot-scope="text">
-        <a>{{ text }}</a>
-      </template>
-    </a-table>
+        <template v-slot:cell(so_luong_nhap)="data">
+          <p>Da in: {{data.value.success}}</p>
+          <p>Loi: {{data.value.failed}}</p>
+        </template>
+
+        <template v-slot:cell(print)="data">
+          <b-button variant="primary">{{data.field.label}}</b-button>
+        </template>
+        <template v-slot:cell(action)="data">
+          <div :class="data.field.label"></div>
+          <b-button variant="success">Add</b-button>
+          <b-button variant="outline-danger">Delete</b-button>
+        </template>
+      </b-table>
+    </div>
   </div>
 </template>
 
 <script>
-const renderContent = (value) => {
-  const obj = {
-    children: value,
-    attrs: {},
-  };
-  return obj;
-};
-
 export default {
-  name: "Home",
+  name: "detail",
   components: {},
   data() {
-    const dataSource = [
-      {
-        key: "1",
-        name: "John Brown",
-        image:
-          "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__340.jpg",
-        age: 32,
-        tel: "0571-22098909",
-        phone: 18889898989,
-        address: "New York No. 1 Lake Park",
-        children: [
-          {
-            key: 11,
-            tel: "0571-22098909",
-            phone: 18889898989,
-            address: "New York No. 1 Lake Park",
-          },
-        ],
-      },
-      {
-        key: "2",
-        name: "Jim Green",
-        image:
-          "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__340.jpg",
-        tel: "0571-22098333",
-        phone: 18889898888,
-        age: 42,
-        address: "London No. 1 Lake Park",
-      },
-    ];
-    const columns = [
-      {
-        title: "Name",
-        dataIndex: "name",
-        customRender: (text) => {
-          return <a href="#">{text}</a>;
-        },
-      },
-      {
-        title: "Age",
-        dataIndex: "age",
-      },
-      {
-        title: "Image",
-        dataIndex: "image",
-        customRender: (text) => {
-          if (text) {
-            return <img src={`${text}`}></img>;
-          }
-        },
-      },
-      {
-        title: "Home phone",
-        dataIndex: "tel",
-        // customRender: (value, row, index) => {
-        //   const obj = {
-        //     children: value,
-        //     attrs: {},
-        //   };
-        //   if (index === 0) {
-        //     obj.attrs.rowSpan = 2;
-        //   }
-        //   // These two are merged into above cell
-        //   if (index === 1) {
-        //     obj.attrs.rowSpan = 0;
-        //   }
-        //   return obj;
-        // },
-      },
-      {
-        title: "Phone",
-        dataIndex: "phone",
-        customRender: renderContent,
-      },
-      {
-        title: "Address",
-        dataIndex: "address",
-        customRender: renderContent,
-      },
-    ];
     return {
-      dataSource,
-      columns,
-    };
-  },
-  methods: {
-    handleAdd() {
-      const { dataSource } = this;
+      fields: [
+        { key: "so_luong" },
+        { key: "so_luong_nhap" },
+        { key: "lot_number" },
+        { key: "lot_date" },
+        { key: "ngay_san_xuat" },
+        { key: "ngay_het_han" },
+      ],
 
-      this.dataSource.forEach(function (element) {
-        if (element.name == "John Brown") {
-          const a = {
-            ...element,
-            key: dataSource.length + 4,
-            gentle: "female",
-          };
-          console.log(a);
-        }
-        else {
-          console.log('failed')
-        }
-      });
-    },
+      items: [
+        {
+          so_luong: 40,
+          so_luong_nhap: { success: 9, failed: 3 },
+        },
+      ],
+      headVariant: "none",
+      fixed: true,
+    };
   },
 };
 </script>
 
 <style lang="scss">
+.position-center {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-left: 0.8em;
+}
+
 .nav {
   background: white;
   box-shadow: 0 0 10px -6px #919aa3;
+
+  .logo {
+    font-weight: bold;
+    font-size: 1.6em;
+  }
 }
 
 .detail-info {
+  padding: 2em 5em;
   display: grid;
-  grid-template-columns: max-content auto 2fr auto 1fr;
+  grid-template-columns: max-content auto 2fr auto auto;
 
   &__item:nth-child(1) {
     font-weight: bold;
@@ -173,7 +130,7 @@ export default {
     padding: 0;
   }
   &__item {
-    padding: 0.2em 1em;
+    padding: 0.5em 1em;
   }
 }
 
@@ -192,6 +149,27 @@ export default {
 
   &:focus {
     outline: none;
+  }
+}
+
+.list {
+  .list-info {
+    display: grid;
+    grid-template-columns: auto auto 1fr auto;
+    align-items: center;
+
+    &__content {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      .label {
+        padding-right: 1em;
+        color: #919aa3;
+      }
+      .content {
+        font-size: 1.5em;
+      }
+    }
   }
 }
 </style>

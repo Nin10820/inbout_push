@@ -5,4 +5,11 @@
 </template>
 
 <style>
+#app {
+  
+}
+.svg-inline--fa.fa-w-10 {
+  width: 1rem;
+}
+
 </style>
