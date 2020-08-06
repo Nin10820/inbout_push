@@ -34,7 +34,7 @@
         @dismiss-count-down="countDownChanged"
         class="fixed-top"
       >Only can add 3 section</b-alert>
-      <div class="container">
+      <div class="px-5">
         <div class="list">
           <div class="list-info py-2">
             <div class="list-info__id p-5">1</div>
@@ -59,14 +59,12 @@
           <b-table
             hover
             bordered
-            fixed
             :items="dataSource"
             :fields="fields"
             :head-variant="headVariant"
             show-empty
-            responsive
           >
-            <template v-slot:empty="scope" >
+            <template v-slot:empty="scope">
               <div class="text-center h1 py-5 text-black-50">
                 <div>
                   <i class="fas fa-box-open"></i>
@@ -87,12 +85,75 @@
               <b-button variant="primary">{{data.field.label}}</b-button>
             </template>
             <template v-slot:cell(action)="data">
-              <b-button variant="outline-info mr-2" class="" >
+              <b-button variant="outline-info mr-2" class>
                 <i class="far fa-edit"></i>
               </b-button>
               <b-button variant="danger" @click="handleDelete(data.item.key)">
                 <i class="fas fa-trash"></i>
               </b-button>
+            </template>
+            <template v-slot:cell(lot_date)>
+              <b-input-group class="mb-3">
+                <b-form-input
+                  v-model="date"
+                  type="text"
+                  size="sm"
+                  placeholder="YYYY-MM-DD"
+                  autocomplete="off"
+                ></b-form-input>
+                <b-input-group-append>
+                  <b-form-datepicker
+                    v-model="date"
+                    button-only
+                    size="sm"
+                    right
+                    locale="en-US"
+                    aria-controls="example-input"
+                  ></b-form-datepicker>
+                </b-input-group-append>
+              </b-input-group>
+            </template>
+            <template v-slot:cell(ngay_san_xuat)>
+              <b-input-group class="mb-3">
+                <b-form-input
+                  v-model="date"
+                  type="text"
+                  size="sm"
+                  placeholder="YYYY-MM-DD"
+                  autocomplete="off"
+                ></b-form-input>
+                <b-input-group-append>
+                  <b-form-datepicker
+                    v-model="date"
+                    button-only
+                    size="sm"
+                    right
+                    locale="en-US"
+                    aria-controls="example-input"
+                  ></b-form-datepicker>
+                </b-input-group-append>
+              </b-input-group>
+            </template>
+            <template v-slot:cell(ngay_het_han)>
+              <b-input-group class="mb-3">
+                <b-form-input
+                  v-model="date"
+                  type="text"
+                  size="sm"
+                  placeholder="YYYY-MM-DD"
+                  autocomplete="off"
+                ></b-form-input>
+                <b-input-group-append>
+                  <b-form-datepicker
+                    v-model="date"
+                    button-only
+                    size="sm"
+                    right
+                    locale="en-US"
+                    aria-controls="example-input"
+                  ></b-form-datepicker>
+                </b-input-group-append>
+              </b-input-group>
             </template>
           </b-table>
         </div>
@@ -107,6 +168,7 @@ export default {
   components: {},
   data() {
     return {
+      date: "",
       fields: [
         { key: "so_luong" },
         { key: "so_luong_nhap" },
@@ -114,7 +176,7 @@ export default {
         { key: "lot_date" },
         { key: "ngay_san_xuat" },
         { key: "ngay_het_han" },
-        { key: "action", tdClass: 'text-center' },
+        { key: "action", tdClass: "text-center" },
       ],
 
       dataSource: [
@@ -127,6 +189,7 @@ export default {
           key: 2,
           so_luong: 2,
           so_luong_nhap: { success: 9, failed: 3 },
+          lot_date: "2020-09-03",
         },
       ],
       headVariant: "light",
