@@ -59,6 +59,7 @@
           <b-table
             hover
             bordered
+            class="d-block"
             :items="dataSource"
             :fields="fields"
             :head-variant="headVariant"
@@ -72,24 +73,33 @@
                 <div>{{ scope.emptyText }}</div>
               </div>
             </template>
-            <template v-slot:cell(image)="data">
-              <img :src="data.value" alt />
+
+            <template v-slot:cell(product_image)="data">
+              <img :src="data.value" :alt="data.value" width="100" height="100" class="img-product"/>
             </template>
 
             <template v-slot:cell(so_luong_nhap)="data">
-              <div>Da in: {{data.value.success}}</div>
-              <div>Loi: {{data.value.failed}}</div>
+              <div>Đã in: {{data.value.success}}</div>
+              <div>Thất bại: {{data.value.failed}}</div>
             </template>
 
-            <template v-slot:cell(print)="data">
-              <b-button variant="primary">{{data.field.label}}</b-button>
+            <template v-slot:cell(print_qr_code)="row">
+              <!-- Start print QR Code -->
+              <b-button variant="outline-info mr-2 mb-2" class="btn" v-model="row.print_qr_code" >
+                <i class="fas fa-play"></i> In
+              </b-button>
+
+              <!-- Stop print QR Code -->
+              <b-button variant="outline-danger" v-model="row.print_qr_code" class="btn">
+                <i class="fas fa-pause"></i> Dừng
+              </b-button>
             </template>
             <template v-slot:cell(action)="data">
-              <b-button variant="outline-info mr-2" class>
-                <i class="far fa-edit"></i>
+              <b-button variant="outline-info mr-2 mb-2" class="" >
+                <i class="fas fa-plus"></i> Thêm Lot
               </b-button>
               <b-button variant="danger" @click="handleDelete(data.item.key)">
-                <i class="fas fa-trash"></i>
+                <i class="fas fa-trash"></i> Xóa Lot
               </b-button>
             </template>
             <template v-slot:cell(lot_date)>
@@ -170,23 +180,31 @@ export default {
     return {
       date: "",
       fields: [
-        { key: "so_luong" },
-        { key: "so_luong_nhap" },
-        { key: "lot_number" },
-        { key: "lot_date" },
-        { key: "ngay_san_xuat" },
-        { key: "ngay_het_han" },
-        { key: "action", tdClass: "text-center" },
+        { key: "product_name", label: "Tên sản phẩm"},
+        { key: "product_image", label: "Hình ảnh sản phẩm", tdClass: 'text-center product-img'},
+        { key: "so_luong", label: "Số lượng" },
+        { key: "so_luong_nhap", label: "Số lượng nhập" },
+        { key: "lot_number", label: "Lot Number" },
+        { key: "lot_date", label: "Lot Date" },
+        { key: "ngay_san_xuat", label: "Ngày sản xuất" },
+        { key: "ngay_het_han", label: "Ngày hết hạn" },
+        { key: "print_qr_code", label: "In QR Code" },
+        { key: "action", tdClass: 'text-center', label: "Thao tác" },
       ],
 
       dataSource: [
         {
           key: 1,
+          product_name: "Panadol Extra",
+          product_image: "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSmrQPqF9mu8n26drpKzmzrefHldBo8HPkduw&usqp=CAU",
           so_luong: 1,
           so_luong_nhap: { success: 9, failed: 3 },
+          ngay_het_han: "2020/08/20"
         },
         {
           key: 2,
+          product_name: "Product 1",
+          product_image: "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSmrQPqF9mu8n26drpKzmzrefHldBo8HPkduw&usqp=CAU",
           so_luong: 2,
           so_luong_nhap: { success: 9, failed: 3 },
           lot_date: "2020-09-03",
@@ -305,5 +323,15 @@ export default {
       }
     }
   }
+}
+
+.img-product {
+  transition: transform .2s;
+  margin: 0 auto;
+}
+.img-product:hover {
+  -ms-transform: scale(1.5); /* IE 9 */
+  -webkit-transform: scale(1.5); /* Safari 3-8 */
+  transform: scale(1.5);
 }
 </style>
