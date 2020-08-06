@@ -10,8 +10,16 @@
       bordered="bordered"
       show-empty
       responsive
+      :busy="isLoading"
+      outlined
     >
-      <template v-slot:empty="scope" >
+      <template v-slot:table-busy>
+        <div class="text-center h1 py-5 text-black-50">
+          <img src="../../assets/images/loading.gif" alt="Loading..." class="loading"/>
+        </div>
+      </template>
+
+      <template v-slot:empty="scope">
         <div class="text-center h1 py-5 text-black-50">
           <div>
             <i class="fas fa-box-open"></i>
@@ -56,7 +64,8 @@ export default {
       ],
       purchaseOrderData: [],
       currentPage: 1,
-      perPage: 10
+      perPage: 10,
+      isLoading: true
     }
   },
   methods: {
@@ -83,9 +92,6 @@ export default {
         });
         return this.purchaseOrderData;
       }
-    },
-    goToDetail(data) {
-      return `/${data.value}`;
     }
   },
   mounted() {
@@ -95,7 +101,10 @@ export default {
                     "api-key": "1fce20616fd2500d63b980b6f37ea8c288378604f47e282ff8644fc5529ebb75"
                   }
                 })
-    .then(res => this.purchaseOrderData = res.data)
+    .then(res => {
+      this.purchaseOrderData = res.data
+      this.isLoading = false;
+    })
     .catch(err => {
       console.log(`Error get List PO ${err}`)
     });
@@ -112,5 +121,10 @@ export default {
   }
   .clickable-row {
     cursor: pointer;
+  }
+
+  .loading {
+    max-width: 100%;
+    background: transparent;
   }
 </style>
