@@ -21,9 +21,9 @@
       </template>
 
       <template v-slot:cell(id)="data">
-        <a :href=goToDetail(data) :alt="data.id">{{ data.value }}</a>
+        <router-link :to="{ name: 'Detail', params: { id: data.value }}">{{ data.value }}</router-link>
       </template>
-    </b-table>
+    </b-table>  
 
     <b-pagination
       v-model="currentPage"
