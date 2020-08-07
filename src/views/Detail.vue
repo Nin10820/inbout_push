@@ -6,166 +6,174 @@
       </router-link>
       <div class="logo">Inbound</div>
     </div>
-    <div class="detail-info">
-      <div class="detail-info__item pr-5">PO123456</div>
-      <div class="detail-info__item">Vendor</div>
-      <div
-        class="detail-info__item"
-      >Quay A2 - Cong ty duoc cua hang 2 Cong ty duoc cua ty duoc cua hang 28 Quay A2 - Cong ty duoc cua hang 2 Cong ty duoc cua ty duoc cua hang 28 Quay A2 - Cong ty duoc cua hang 2 Cong ty duoc cua ty duoc cua hang 28</div>
-      <div class="detail-info__item">Purchase Payment</div>
-      <div class="detail-info__item">Cash</div>
-      <div class="detail-info__item">Scheduled Date</div>
-      <div class="detail-info__item">06/26/2020 16:20:16</div>
-      <div class="detail-info__item">Company</div>
-      <div class="detail-info__item">MEDX</div>
-      <div class="detail-info__item">Delivery</div>
-      <div class="detail-info__item">WH:Receipts</div>
+    <div class="theme-container" v-if="isLoading">
+      <div class="text-center h1 py-5 text-black-50">
+        <img src="../assets/images/loading.gif" alt="Loading..." class="loading"/>
+      </div>
     </div>
-    <div class="my-3 px-3 position-relative">
-      <i class="fas fa-search text-muted position-center"></i>
-      <input type="search" class="w-25 input-search pl-5" placeholder="Some Input Text" name id />
-    </div>
-    <div class="container-fluid bg-light">
-      <b-alert
-        :show="dismissCountDown"
-        dismissible
-        fade
-        variant="danger"
-        @dismiss-count-down="countDownChanged"
-        class="fixed-top"
-      >Only can add 3 section</b-alert>
-      <div class="px-5">
-        <div class="list">
-          <div class="list-info py-2">
-            <div class="list-info__id p-5">1</div>
-            <div class="list-info__image justify-content-center d-flex px-2">
-              <img
-                src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSmrQPqF9mu8n26drpKzmzrefHldBo8HPkduw&usqp=CAU"
-                alt
-              />
-            </div>
-            <div class="list-info__content px-3">
-              <div class="label">Name:</div>
-              <div class="content">Avcvwawvawe</div>
-              <div class="label">So luong:</div>
-              <div class="content">12</div>
-            </div>
-            <div class="list-info__btnGroup px-5 border-left border-right text-center">
-              <b-button variant="success d-block my-2 mx-auto" @click="handleAdd">Add</b-button>
-              <b-button variant="outline-primary">Print QR</b-button>
-            </div>
-          </div>
-
-          <b-table
-            hover
-            bordered
-            class="d-block"
-            :items="dataSource"
-            :fields="fields"
-            :head-variant="headVariant"
-            show-empty
-          >
-            <template v-slot:empty="scope">
-              <div class="text-center h1 py-5 text-black-50">
-                <div>
-                  <i class="fas fa-box-open"></i>
-                </div>
-                <div>{{ scope.emptyText }}</div>
+    <div class="theme-container" v-else>
+      <div class="detail-info">
+        <div class="detail-info__item pr-5 text-uppercase">{{ purchaseOrderDetail.ref }}</div>
+        <div class="detail-info__item">Vendor</div>
+        <div
+          class="detail-info__item text-capitalize"
+        >{{ purchaseOrderDetail.partner }}</div>
+        <div class="detail-info__item">Purchase Payment</div>
+        <div class="detail-info__item">Cash</div>
+        <div class="detail-info__item">Scheduled Date</div>
+        <div class="detail-info__item">06/26/2020 16:20:16</div>
+        <div class="detail-info__item">Company</div>
+        <div class="detail-info__item">MEDX</div>
+        <div class="detail-info__item">Delivery</div>
+        <div class="detail-info__item">{{ purchaseOrderDetail.name }}</div>
+      </div>
+      <div class="my-3 px-3 position-relative">
+        <i class="fas fa-search text-muted position-center"></i>
+        <input type="search" class="w-25 input-search pl-5" placeholder="Some Input Text" name id />
+      </div>
+      <div class="container-fluid bg-light">
+        <b-alert
+          :show="dismissCountDown"
+          dismissible
+          fade
+          variant="danger"
+          @dismiss-count-down="countDownChanged"
+          class="fixed-top"
+        >Only can add 3 section</b-alert>
+        <div class="px-5">
+          <div class="list" v-for="product in purchaseOrderDetail.lines" :key="product.id">
+            <div class="list-info py-2">
+              <div class="list-info__id p-5">{{ product.id }}</div>
+              <div class="list-info__image justify-content-center d-flex px-2">
+                <img
+                  :src="product.image_url ? product.image_url : 'https://assets.thuocsi.vn/assets/defaults/missing-e9cfa4812c342b9780b61700d2ade43591b3c5992f4dffedaa542c07d854b602.png'"
+                  :alt="product.name"
+                  width="200" height="200"
+                />
               </div>
-            </template>
+              <div class="list-info__content px-3">
+                <div class="label">Tên sản phẩm&colon;</div>
+                <div class="content text-capitalize">{{ product.name }}</div>
+                <div class="label">Số lượng&colon;</div>
+                <div class="content">{{ product.demand_qty }}</div>
+              </div>
+              <div class="list-info__btnGroup px-5 border-left border-right text-center">
+                <b-button variant="success d-block my-2 mx-auto" @click="handleAdd">Add</b-button>
+                <b-button variant="outline-primary">Print QR</b-button>
+              </div>
+            </div>
 
-            <template v-slot:cell(product_image)="data">
-              <img :src="data.value" :alt="data.value" width="100" height="100" class="img-product"/>
-            </template>
+            <b-table
+              hover
+              bordered
+              class="d-block"
+              :items="dataSource"
+              :fields="fields"
+              :head-variant="headVariant"
+              show-empty
+            >
+              <template v-slot:empty="scope">
+                <div class="text-center h1 py-5 text-black-50">
+                  <div>
+                    <i class="fas fa-box-open"></i>
+                  </div>
+                  <div>{{ scope.emptyText }}</div>
+                </div>
+              </template>
 
-            <template v-slot:cell(so_luong_nhap)="data">
-              <div>Đã in: {{data.value.success}}</div>
-              <div>Thất bại: {{data.value.failed}}</div>
-            </template>
+              <template v-slot:cell(product_image)="data">
+                <img :src="data.value" :alt="data.value" width="100" height="100" class="img-product"/>
+              </template>
 
-            <template v-slot:cell(print_qr_code)="row">
-              <!-- Start print QR Code -->
-              <b-button variant="outline-info mr-2 mb-2" class="btn" v-model="row.print_qr_code" >
-                <i class="fas fa-play"></i> In
-              </b-button>
+              <template v-slot:cell(so_luong_nhap)="data">
+                <div>Đã in: {{data.value.success}}</div>
+                <div>Thất bại: {{data.value.failed}}</div>
+              </template>
 
-              <!-- Stop print QR Code -->
-              <b-button variant="outline-danger" v-model="row.print_qr_code" class="btn">
-                <i class="fas fa-pause"></i> Dừng
-              </b-button>
-            </template>
-            <template v-slot:cell(action)="data">
-              <b-button variant="outline-info mr-2 mb-2" class="" >
-                <i class="fas fa-plus"></i> Thêm Lot
-              </b-button>
-              <b-button variant="danger" @click="handleDelete(data.item.key)">
-                <i class="fas fa-trash"></i> Xóa Lot
-              </b-button>
-            </template>
-            <template v-slot:cell(lot_date)>
-              <b-input-group class="mb-3">
-                <b-form-input
-                  v-model="date"
-                  type="text"
-                  size="sm"
-                  placeholder="YYYY-MM-DD"
-                  autocomplete="off"
-                ></b-form-input>
-                <b-input-group-append>
-                  <b-form-datepicker
+              <template v-slot:cell(print_qr_code)="row">
+                <!-- Start print QR Code -->
+                <b-button variant="outline-info mr-2 mb-2" class="btn" v-model="row.print_qr_code" >
+                  <i class="fas fa-play"></i> In
+                </b-button>
+
+                <!-- Stop print QR Code -->
+                <b-button variant="outline-danger" v-model="row.print_qr_code" class="btn">
+                  <i class="fas fa-pause"></i> Dừng
+                </b-button>
+              </template>
+              <template v-slot:cell(action)="data">
+                <b-button variant="outline-info mr-2 mb-2" class="" >
+                  <i class="fas fa-plus"></i> Thêm Lot
+                </b-button>
+                <b-button variant="danger" @click="handleDelete(data.item.key)">
+                  <i class="fas fa-trash"></i> Xóa Lot
+                </b-button>
+              </template>
+              <template v-slot:cell(lot_date)>
+                <b-input-group class="mb-3">
+                  <b-form-input
                     v-model="date"
-                    button-only
+                    type="text"
                     size="sm"
-                    right
-                    locale="en-US"
-                    aria-controls="example-input"
-                  ></b-form-datepicker>
-                </b-input-group-append>
-              </b-input-group>
-            </template>
-            <template v-slot:cell(ngay_san_xuat)>
-              <b-input-group class="mb-3">
-                <b-form-input
-                  v-model="date"
-                  type="text"
-                  size="sm"
-                  placeholder="YYYY-MM-DD"
-                  autocomplete="off"
-                ></b-form-input>
-                <b-input-group-append>
-                  <b-form-datepicker
+                    placeholder="YYYY-MM-DD"
+                    autocomplete="off"
+                  ></b-form-input>
+                  <b-input-group-append>
+                    <b-form-datepicker
+                      v-model="date"
+                      button-only
+                      size="sm"
+                      right
+                      locale="en-US"
+                      aria-controls="example-input"
+                    ></b-form-datepicker>
+                  </b-input-group-append>
+                </b-input-group>
+              </template>
+              <template v-slot:cell(ngay_san_xuat)>
+                <b-input-group class="mb-3">
+                  <b-form-input
                     v-model="date"
-                    button-only
+                    type="text"
                     size="sm"
-                    right
-                    locale="en-US"
-                    aria-controls="example-input"
-                  ></b-form-datepicker>
-                </b-input-group-append>
-              </b-input-group>
-            </template>
-            <template v-slot:cell(ngay_het_han)>
-              <b-input-group class="mb-3">
-                <b-form-input
-                  v-model="date"
-                  type="text"
-                  size="sm"
-                  placeholder="YYYY-MM-DD"
-                  autocomplete="off"
-                ></b-form-input>
-                <b-input-group-append>
-                  <b-form-datepicker
+                    placeholder="YYYY-MM-DD"
+                    autocomplete="off"
+                  ></b-form-input>
+                  <b-input-group-append>
+                    <b-form-datepicker
+                      v-model="date"
+                      button-only
+                      size="sm"
+                      right
+                      locale="en-US"
+                      aria-controls="example-input"
+                    ></b-form-datepicker>
+                  </b-input-group-append>
+                </b-input-group>
+              </template>
+              <template v-slot:cell(ngay_het_han)>
+                <b-input-group class="mb-3">
+                  <b-form-input
                     v-model="date"
-                    button-only
+                    type="text"
                     size="sm"
-                    right
-                    locale="en-US"
-                    aria-controls="example-input"
-                  ></b-form-datepicker>
-                </b-input-group-append>
-              </b-input-group>
-            </template>
-          </b-table>
+                    placeholder="YYYY-MM-DD"
+                    autocomplete="off"
+                  ></b-form-input>
+                  <b-input-group-append>
+                    <b-form-datepicker
+                      v-model="date"
+                      button-only
+                      size="sm"
+                      right
+                      locale="en-US"
+                      aria-controls="example-input"
+                    ></b-form-datepicker>
+                  </b-input-group-append>
+                </b-input-group>
+              </template>
+            </b-table>
+          </div>
         </div>
       </div>
     </div>
@@ -173,6 +181,8 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: "detail",
   components: {},
@@ -213,9 +223,25 @@ export default {
       headVariant: "light",
       dismissSecs: 1,
       dismissCountDown: 0,
+      purchaseOrderDetail: {},
+      isLoading: true
     };
   },
-
+  created() {
+    axios.get("https://cors-anywhere.herokuapp.com/https://erp.stg.thuocsi.vn/api/v1/receipts/133044",
+                { headers:
+                  {
+                    "api-key": "1fce20616fd2500d63b980b6f37ea8c288378604f47e282ff8644fc5529ebb75"
+                  }
+                })
+    .then(res => {
+      this.purchaseOrderDetail = res.data
+      this.isLoading = false;
+    })
+    .catch(err => {
+      console.log(`Error get List PO ${err}`)
+    });
+  },
   methods: {
     // handleDelete(key) {
     //   const dataSource = [...this.dataSource];
