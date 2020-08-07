@@ -32,20 +32,12 @@
         <input type="search" class="w-25 input-search pl-5" placeholder="Some Input Text" name id />
       </div>
       <div class="container-fluid bg-light">
-        <b-alert
-          :show="dismissCountDown"
-          dismissible
-          fade
-          variant="danger"
-          @dismiss-count-down="countDownChanged"
-          class="fixed-top"
-        >Only can add 3 section</b-alert>
         <div class="px-5">
           <div class="list" v-for="product in purchaseOrderDetail.lines" :key="product.id">
             <div class="list-info py-2">
               <div class="list-info__id p-5">{{ product.id }}</div>
               <div class="list-info__image justify-content-center d-flex px-2">
-                <img
+                <img class="img-product"
                   :src="product.image_url ? product.image_url : 'https://assets.thuocsi.vn/assets/defaults/missing-e9cfa4812c342b9780b61700d2ade43591b3c5992f4dffedaa542c07d854b602.png'"
                   :alt="product.name"
                   width="200" height="200"
@@ -58,15 +50,15 @@
                 <div class="content">{{ product.demand_qty }}</div>
               </div>
               <div class="list-info__btnGroup px-5 border-left border-right text-center">
-                <b-button variant="success d-block my-2 mx-auto" @click="handleAdd">Add</b-button>
-                <b-button variant="outline-primary">Print QR</b-button>
+                <b-button variant="outline-info mr-2 mb-2" @click="handleAdd" :disabled="isAddLot" >
+                  <i class="fas fa-plus"></i> Thêm Lot
+                </b-button>
               </div>
             </div>
 
             <b-table
               hover
               bordered
-              class="d-block"
               :items="dataSource"
               :fields="fields"
               :head-variant="headVariant"
@@ -81,18 +73,14 @@
                 </div>
               </template>
 
-              <template v-slot:cell(product_image)="data">
-                <img :src="data.value" :alt="data.value" width="100" height="100" class="img-product"/>
-              </template>
-
-              <template v-slot:cell(so_luong_nhap)="data">
+              <template v-slot:cell(done_qty)="data">
                 <div>Đã in: {{data.value.success}}</div>
                 <div>Thất bại: {{data.value.failed}}</div>
               </template>
 
               <template v-slot:cell(print_qr_code)="row">
                 <!-- Start print QR Code -->
-                <b-button variant="outline-info mr-2 mb-2" class="btn" v-model="row.print_qr_code" >
+                <b-button variant="outline-info mr-2" class="btn" v-model="row.print_qr_code" @click="printQRCode">
                   <i class="fas fa-play"></i> In
                 </b-button>
 
@@ -102,10 +90,7 @@
                 </b-button>
               </template>
               <template v-slot:cell(action)="data">
-                <b-button variant="outline-info mr-2 mb-2" class="" >
-                  <i class="fas fa-plus"></i> Thêm Lot
-                </b-button>
-                <b-button variant="danger" @click="handleDelete(data.item.key)">
+                <b-button variant="danger" @click="handleDelete(data.item.key)" :disabled="isPrintQRCode">
                   <i class="fas fa-trash"></i> Xóa Lot
                 </b-button>
               </template>
@@ -117,6 +102,7 @@
                     size="sm"
                     placeholder="YYYY-MM-DD"
                     autocomplete="off"
+                    :disabled="isPrintQRCode"
                   ></b-form-input>
                   <b-input-group-append>
                     <b-form-datepicker
@@ -126,6 +112,7 @@
                       right
                       locale="en-US"
                       aria-controls="example-input"
+                      :disabled="isPrintQRCode"
                     ></b-form-datepicker>
                   </b-input-group-append>
                 </b-input-group>
@@ -138,6 +125,7 @@
                     size="sm"
                     placeholder="YYYY-MM-DD"
                     autocomplete="off"
+                    :disabled="isPrintQRCode"
                   ></b-form-input>
                   <b-input-group-append>
                     <b-form-datepicker
@@ -159,6 +147,7 @@
                     size="sm"
                     placeholder="YYYY-MM-DD"
                     autocomplete="off"
+                    :disabled="isPrintQRCode"
                   ></b-form-input>
                   <b-input-group-append>
                     <b-form-datepicker
@@ -190,10 +179,7 @@ export default {
     return {
       date: "",
       fields: [
-        { key: "product_name", label: "Tên sản phẩm"},
-        { key: "product_image", label: "Hình ảnh sản phẩm", tdClass: 'text-center product-img'},
-        { key: "so_luong", label: "Số lượng" },
-        { key: "so_luong_nhap", label: "Số lượng nhập" },
+        { key: "done_qty", label: "Số lượng nhập" },
         { key: "lot_number", label: "Lot Number" },
         { key: "lot_date", label: "Lot Date" },
         { key: "ngay_san_xuat", label: "Ngày sản xuất" },
@@ -203,32 +189,28 @@ export default {
       ],
 
       dataSource: [
-        {
-          key: 1,
-          product_name: "Panadol Extra",
-          product_image: "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSmrQPqF9mu8n26drpKzmzrefHldBo8HPkduw&usqp=CAU",
-          so_luong: 1,
-          so_luong_nhap: { success: 9, failed: 3 },
-          ngay_het_han: "2020/08/20"
-        },
-        {
-          key: 2,
-          product_name: "Product 1",
-          product_image: "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSmrQPqF9mu8n26drpKzmzrefHldBo8HPkduw&usqp=CAU",
-          so_luong: 2,
-          so_luong_nhap: { success: 9, failed: 3 },
-          lot_date: "2020-09-03",
-        },
-      ],
+      {
+        key: 1,
+        so_luong: 1,
+        so_luong_nhap: { success: 9, failed: 3 }
+      },
+      {
+        key: 2,
+        so_luong: 2,
+        so_luong_nhap: { success: 9, failed: 3 }
+      },
+    ],
+
       headVariant: "light",
-      dismissSecs: 1,
-      dismissCountDown: 0,
       purchaseOrderDetail: {},
-      isLoading: true
+      isLoading: true,
+      isPrintQRCode: false,
+      isAddLot: false
     };
   },
   created() {
-    axios.get("https://cors-anywhere.herokuapp.com/https://erp.stg.thuocsi.vn/api/v1/receipts/133044",
+    const id = this.$route.params.id;
+    axios.get(`https://cors-anywhere.herokuapp.com/https://erp.stg.thuocsi.vn/api/v1/receipts/${id}`,
                 { headers:
                   {
                     "api-key": "1fce20616fd2500d63b980b6f37ea8c288378604f47e282ff8644fc5529ebb75"
@@ -243,24 +225,18 @@ export default {
     });
   },
   methods: {
-    // handleDelete(key) {
-    //   const dataSource = [...this.dataSource];
-    //   this.dataSource = dataSource.filter((item) => item.key !== key);
-    // },
-    countDownChanged(dismissCountDown) {
-      this.dismissCountDown = dismissCountDown;
-    },
     handleAdd() {
-      const { dataSource } = this;
-      if (dataSource.length < 3) {
+      if (this.dataSource.length < 3) {
         const newData = {
-          key: dataSource.length + 1,
-          so_luong: dataSource.length + 2,
+          key: this.dataSource.length + 1,
+          so_luong: this.dataSource.length + 2,
           so_luong_nhap: { success: 9, failed: 3 },
         };
-        this.dataSource = [...dataSource, newData];
-      } else {
-        this.dismissCountDown = this.dismissSecs;
+        this.dataSource = [...this.dataSource, newData];
+
+        if (this.dataSource.length === 3) {
+          this.isAddLot = true;
+        }
       }
     },
     handleDelete(key) {
@@ -271,6 +247,9 @@ export default {
         }
       });
     },
+    printQRCode() {
+      this.isPrintQRCode = true;
+    }
   },
 };
 </script>
@@ -359,5 +338,10 @@ export default {
   -ms-transform: scale(1.5); /* IE 9 */
   -webkit-transform: scale(1.5); /* Safari 3-8 */
   transform: scale(1.5);
+}
+.loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
 }
 </style>
