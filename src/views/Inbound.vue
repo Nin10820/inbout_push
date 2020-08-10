@@ -6,7 +6,7 @@
       </router-link>
       <div class="logo">Inbound</div>
     </div>
-    <div class="theme-container" v-if="false">
+    <div class="theme-container" v-if="isLoading">
       <div class="text-center h1 py-5 text-black-50">
         <img src="../assets/images/loading.gif" alt="Loading..." class="loading" />
       </div>
@@ -53,7 +53,7 @@
                 <div class="content">{{ product.demand_qty }}</div>
               </div>
               <div class="list-info__btnGroup px-5 border-left border-right text-center">
-                <b-button variant="outline-info mr-2 mb-2" @click="handleAdd" :disabled="isAddLot">
+                <b-button variant="outline-info mr-2 mb-2" @click="handleAdd(event)" :disabled="isAddLot">
                   <i class="fas fa-plus"></i> Thêm Lot
                 </b-button>
               </div>
@@ -81,20 +81,10 @@
                 <div>Thất bại: {{data.item.doneQty.yet}}</div>
               </template>
 
-              <template v-slot:cell(printQRCode)="row">
+              <template v-slot:cell(printQRCode)="data">
                 <!-- Start print QR Code -->
-                <b-button
-                  variant="outline-info mr-2"
-                  class="btn"
-                  v-model="row.print_qr_code"
-                  @click="printQRCode"
-                >
-                  <i class="fas fa-play"></i> In
-                </b-button>
-
-                <!-- Stop print QR Code -->
-                <b-button variant="outline-danger" v-model="row.print_qr_code" class="btn">
-                  <i class="fas fa-pause"></i> Dừng
+                <b-button variant="outline-info" :class="outlineButton" @click="printQRCode()" :id="data.item.key">
+                  <font-awesome-icon :icon="isPrintQRCode ? ['fas', 'pause'] : ['fas', 'play']"></font-awesome-icon> {{ txtPrintAction }}
                 </b-button>
               </template>
               <template v-slot:cell(action)="data">
@@ -157,19 +147,69 @@ export default {
         { key: "printQRCode", label: "In QR Code" },
         { key: "action", tdClass: "text-center", label: "Thao tác" },
       ],
+      dataProduct: {
+        "id": 133089,
+        "name": "WH-C7/IN/39634",
+        "ref": "PO31523",
+        "partner": "Quầy D24 - Công ty TNHH Thương Mại Dược Phẩm Minh Sang - New",
+        "date": "2020-05-27",
+        "lines": [
+            {
+                "id": 2173529,
+                "product_id": 8485,
+                "image_url": "https://buymed-storage.s3.ap-southeast-1.amazonaws.com/u1AhMkReaqfdVm8trgEbwDPw",
+                "name": "curmagold fast cvi (h/30v)",
+                "demand_qty": 1,
+                "done_qty": 0,
+                "uom": "Unit(s)"
+            },
+            {
+                "id": 2173540,
+                "product_id": 2522,
+                "image_url": "https://buymed-storage.s3.ap-southeast-1.amazonaws.com/6tuKNXgrzQETwzS4Fa66jw4K",
+                "name": "grafort dioctahedral smectite 3g - daewong (h/20g)",
+                "demand_qty": 5,
+                "done_qty": 0,
+                "uom": "Unit(s)"
+            },
+            {
+                "id": 2173545,
+                "product_id": 7477,
+                "image_url": "https://buymed-storage.s3.ap-southeast-1.amazonaws.com/dZVUtPtQMNq4C2dK8wgcfrw1",
+                "name": "liverton 70 pymepharco (h/100v)",
+                "demand_qty": 5,
+                "done_qty": 0,
+                "uom": "Unit(s)"
+            },
+            {
+                "id": 2173558,
+                "product_id": 4511,
+                "image_url": false,
+                "name": "viên sủi diệp hạ châu râu ngô rau má (tube/20v)",
+                "demand_qty": 16,
+                "done_qty": 0,
+                "uom": "Unit(s)"
+            }
+        ]
+      },
       dataSource: [
         {
+          id: 2147096,
           key: 1,
           doneQty: { done: 1, yet: 2 },
           lotNumber: 3,
-          lotDate: "",
-          productionDate: "",
-          expDate: "",
+          lotDate: null,
+          productionDate: null,
+          expDate: null
         },
         {
+          id: 2147101,
           key: 2,
           doneQty: { done: 1, yet: 2 },
           lotNumber: 3,
+          lotDate: null,
+          productionDate: null,
+          expDate: null
         },
       ],
 
@@ -179,6 +219,8 @@ export default {
       isPrintQRCode: false,
       isAddLot: false,
       isDisplay: true,
+      outlineButton: "outline-info",
+      txtPrintAction: 'In'
     };
   },
   created() {
@@ -193,6 +235,7 @@ export default {
       }
     },
     getInboundById() {
+      // TODO: get Inbound API later
       getInbound(this.$route.params.id)
         .then((res) => {
           if (this.searchInput.length === 0) {
@@ -209,13 +252,35 @@ export default {
         .catch((err) => {
           console.log(`Error get List PO ${err}`);
         });
+      // if (this.searchInput.length === 0) {
+      //     this.isLoading = false;
+      //     this.inbound = this.dataProduct;
+      // } else {
+      //   this.filterInboundProduct(this.dataProduct.lines);
+      // }
+    },
+    filterInboundProduct(data) {
+      this.isLoading = true;
+
+      this.inbound.lines = data.filter((product) => {
+        return product.name
+                .toLowerCase()
+                .includes(this.searchInput.toLowerCase())
+      });
+      this.isLoading = false;
     },
     handleAdd() {
       if (this.dataSource.length < 3) {
         const newData = {
           key: this.dataSource.length + 1,
-          doneQty: this.dataSource.length + 2,
+          doneQty: { done: 0, yet: 0 },
+          lotNumber: 0,
+          lotDate: "",
+          productionDate: "",
+          expDate: "",
+          lineRow: this.lineRow + 1
         };
+
         this.dataSource = [...this.dataSource, newData];
 
         if (this.dataSource.length === 3) {
@@ -233,8 +298,17 @@ export default {
       });
     },
     printQRCode() {
-      // TODO: Need Implement action print QR Code
-      this.isPrintQRCode = true;
+      // TODO: Need Implement action print QR Code and I18n
+      // Toggle button
+      if (this.isPrintQRCode) {
+        this.isPrintQRCode = false;
+        this.outlineButton = "btn-outline-info";
+        this.txtPrintAction = "In";
+      } else {
+        this.isPrintQRCode = true
+        this.outlineButton = "btn-outline-danger";
+        this.txtPrintAction = "Dừng";
+      }
     },
   },
 };
