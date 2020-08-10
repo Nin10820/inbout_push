@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
-import PurchaseOrders from '../views/PurchaseOrders.vue'
+import Inbounds from '../views/Inbounds.vue'
 
 // Install BootstrapVue
 Vue.use(BootstrapVue)
@@ -13,16 +13,16 @@ Vue.use(VueRouter)
   const routes = [
   {
     path: "/",
-    name: "PurchaseOrders",
-    component: PurchaseOrders
+    name: "Inbounds",
+    component: Inbounds
   },
   {
     path: '/:id',
-    name: 'Detail',
+    name: 'Inbound',
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/Detail.vue')
+    component: () => import(/* webpackChunkName: "about" */ '../views/Inbound.vue')
   }
 ]
 

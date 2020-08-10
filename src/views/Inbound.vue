@@ -13,11 +13,11 @@
     </div>
     <div class="theme-container" v-else>
       <div class="detail-info">
-        <div class="detail-info__item pr-5 text-uppercase">{{ purchaseOrderDetail.ref }}</div>
+        <div class="detail-info__item pr-5 text-uppercase">{{ inbound.ref }}</div>
         <div class="detail-info__item">Vendor</div>
         <div
           class="detail-info__item text-capitalize"
-        >{{ purchaseOrderDetail.partner }}</div>
+        >{{ inbound.partner }}</div>
         <div class="detail-info__item">Purchase Payment</div>
         <div class="detail-info__item">Cash</div>
         <div class="detail-info__item">Scheduled Date</div>
@@ -25,7 +25,7 @@
         <div class="detail-info__item">Company</div>
         <div class="detail-info__item">MEDX</div>
         <div class="detail-info__item">Delivery</div>
-        <div class="detail-info__item">{{ purchaseOrderDetail.name }}</div>
+        <div class="detail-info__item">{{ inbound.name }}</div>
       </div>
 
       <div class="container-fluid">
@@ -40,7 +40,7 @@
 
       <div class="container-fluid bg-light">
         <div class="px-5">
-          <div class="list" v-for="product in purchaseOrderDetail.lines" :key="product.id">
+          <div class="list" v-for="product in inbound.lines" :key="product.id">
             {{ product }}
             <div class="list-info py-2">
               <div class="list-info__id p-5">{{ product.id }}</div>
@@ -81,12 +81,12 @@
                 </div>
               </template>
 
-              <template v-slot:cell(done_qty)="data">
+              <template v-slot:cell(doneQty)="data">
                 <div>Đã in: {{data.value.success}}</div>
                 <div>Thất bại: {{data.value.failed}}</div>
               </template>
 
-              <template v-slot:cell(print_qr_code)="row">
+              <template v-slot:cell(printQRCode)="row">
                 <!-- Start print QR Code -->
                 <b-button variant="outline-info mr-2" class="btn" v-model="row.print_qr_code" @click="printQRCode">
                   <i class="fas fa-play"></i> In
@@ -102,7 +102,7 @@
                   <i class="fas fa-trash"></i> Xóa Lot
                 </b-button>
               </template>
-              <template v-slot:cell(lot_date)>
+              <template v-slot:cell(lotDate)>
                 <b-input-group class="mb-3">
                   <b-form-input
                     v-model="date"
@@ -125,7 +125,7 @@
                   </b-input-group-append>
                 </b-input-group>
               </template>
-              <template v-slot:cell(ngay_san_xuat)>
+              <template v-slot:cell(productionDate)>
                 <b-input-group class="mb-3">
                   <b-form-input
                     v-model="date"
@@ -147,7 +147,7 @@
                   </b-input-group-append>
                 </b-input-group>
               </template>
-              <template v-slot:cell(ngay_het_han)>
+              <template v-slot:cell(expDate)>
                 <b-input-group class="mb-3">
                   <b-form-input
                     v-model="date"
@@ -181,36 +181,34 @@
 import axios from "axios";
 
 export default {
-  name: "detail",
+  name: "Inbound",
   data() {
     return {
       date: "",
       searchInput: "",
       fields: [
-        { key: "done_qty", label: "Số lượng nhập" },
-        { key: "lot_number", label: "Lot Number" },
-        { key: "lot_date", label: "Lot Date" },
-        { key: "ngay_san_xuat", label: "Ngày sản xuất" },
-        { key: "ngay_het_han", label: "Ngày hết hạn" },
-        { key: "print_qr_code", label: "In QR Code" },
+        { key: "doneQty", label: "Số lượng nhập" },
+        { key: "lotNumber", label: "Lot Number" },
+        { key: "lotDate", label: "Lot Date" },
+        { key: "productionDate", label: "Ngày sản xuất" },
+        { key: "expDate", label: "Ngày hết hạn" },
+        { key: "printQRCode", label: "In QR Code" },
         { key: "action", tdClass: 'text-center', label: "Thao tác" },
       ],
 
       dataSource: [
       {
         key: 1,
-        so_luong: 1,
-        so_luong_nhap: { success: 9, failed: 3 }
+        done_qty: 1
       },
       {
         key: 2,
-        so_luong: 2,
-        so_luong_nhap: { success: 9, failed: 3 }
+        done_qty: 2
       },
     ],
 
       headVariant: "light",
-      purchaseOrderDetail: {},
+      inbound: {},
       isLoading: true,
       isPrintQRCode: false,
       isAddLot: false
@@ -230,11 +228,11 @@ export default {
                   })
       .then(res => {
         if (this.searchInput.length === 0) {
-          this.purchaseOrderDetail = res.data;
+          this.inbound = res.data;
           this.isLoading = false;
         } else {
-          console.log(this.purchaseOrderDetail)
-          this.purchaseOrderDetail = res.data.lines.filter(product => {
+          console.log(this.inbound)
+          this.inbound = res.data.lines.filter(product => {
             product.name.toLowerCase().includes(this.searchInput.toLowerCase())
           })
         }
@@ -246,8 +244,7 @@ export default {
       if (this.dataSource.length < 3) {
         const newData = {
           key: this.dataSource.length + 1,
-          so_luong: this.dataSource.length + 2,
-          so_luong_nhap: { success: 9, failed: 3 },
+          doneQty: this.dataSource.length + 2
         };
         this.dataSource = [...this.dataSource, newData];
 
