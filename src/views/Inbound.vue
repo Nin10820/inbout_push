@@ -6,18 +6,16 @@
       </router-link>
       <div class="logo">Inbound</div>
     </div>
-    <div class="theme-container" v-if="isLoading">
+    <div class="theme-container" v-if="false">
       <div class="text-center h1 py-5 text-black-50">
-        <img src="../assets/images/loading.gif" alt="Loading..." class="loading"/>
+        <img src="../assets/images/loading.gif" alt="Loading..." class="loading" />
       </div>
     </div>
     <div class="theme-container" v-else>
       <div class="detail-info">
         <div class="detail-info__item pr-5 text-uppercase">{{ inbound.ref }}</div>
         <div class="detail-info__item">Vendor</div>
-        <div
-          class="detail-info__item text-capitalize"
-        >{{ inbound.partner }}</div>
+        <div class="detail-info__item text-capitalize">{{ inbound.partner }}</div>
         <div class="detail-info__item">Purchase Payment</div>
         <div class="detail-info__item">Cash</div>
         <div class="detail-info__item">Scheduled Date</div>
@@ -32,7 +30,16 @@
         <div class="form-group px-5 form-inline">
           <div class="my-3 px-3 position-relative" :class="displayInpSearch()" v-if="isDisplay">
             <i class="fas fa-search text-muted position-icon"></i>
-            <input type="search" class="input-search" placeholder="Nhập tên thuốc cần tìm..." v-model="searchInput" @keyup="getInboundById" />
+            <b-input-group class="mb-3">
+              <b-form-input
+                type="search"
+                class="input-search"
+                placeholder="Nhập tên thuốc cần tìm..."
+                v-model="searchInput"
+                @keyup="getInboundById"
+              ></b-form-input>
+              <i class="fas fa-search text-muted position-icon"></i>
+            </b-input-group>
           </div>
           <b-button variant="primary ml-auto">Hoàn tất</b-button>
         </div>
@@ -44,10 +51,12 @@
             <div class="list-info py-2">
               <div class="list-info__id p-5">{{ product.id }}</div>
               <div class="list-info__image justify-content-center d-flex px-2">
-                <img class="img-product"
+                <img
+                  class="img-product"
                   :src="product.image_url ? product.image_url : 'https://assets.thuocsi.vn/assets/defaults/missing-e9cfa4812c342b9780b61700d2ade43591b3c5992f4dffedaa542c07d854b602.png'"
                   :alt="product.name"
-                  width="150" height="150"
+                  width="150"
+                  height="150"
                 />
               </div>
               <div class="list-info__content px-3">
@@ -57,7 +66,7 @@
                 <div class="content">{{ product.demand_qty }}</div>
               </div>
               <div class="list-info__btnGroup px-5 border-left border-right text-center">
-                <b-button variant="outline-info mr-2 mb-2" @click="handleAdd" :disabled="isAddLot" >
+                <b-button variant="outline-info mr-2 mb-2" @click="handleAdd" :disabled="isAddLot">
                   <i class="fas fa-plus"></i> Thêm Lot
                 </b-button>
               </div>
@@ -81,13 +90,18 @@
               </template>
 
               <template v-slot:cell(doneQty)="data">
-                <div>Đã in: {{data.value.success}}</div>
-                <div>Thất bại: {{data.value.failed}}</div>
+                <div>Đã in: {{data.item.doneQty.done}}</div>
+                <div>Thất bại: {{data.item.doneQty.yet}}</div>
               </template>
 
               <template v-slot:cell(printQRCode)="row">
                 <!-- Start print QR Code -->
-                <b-button variant="outline-info mr-2" class="btn" v-model="row.print_qr_code" @click="printQRCode">
+                <b-button
+                  variant="outline-info mr-2"
+                  class="btn"
+                  v-model="row.print_qr_code"
+                  @click="printQRCode"
+                >
                   <i class="fas fa-play"></i> In
                 </b-button>
 
@@ -97,76 +111,34 @@
                 </b-button>
               </template>
               <template v-slot:cell(action)="data">
-                <b-button variant="danger" @click="handleDelete(data.item.key)" :disabled="isPrintQRCode">
+                <b-button
+                  variant="danger"
+                  @click="handleDelete(data.item.key)"
+                  :disabled="isPrintQRCode"
+                >
                   <i class="fas fa-trash"></i> Xóa Lot
                 </b-button>
               </template>
-              <template v-slot:cell(lotDate)>
-                <b-input-group class="mb-3">
-                  <b-form-input
-                    v-model="date"
-                    type="text"
-                    size="sm"
-                    placeholder="YYYY-MM-DD"
-                    autocomplete="off"
-                    :disabled="isPrintQRCode"
-                  ></b-form-input>
-                  <b-input-group-append>
-                    <b-form-datepicker
-                      v-model="date"
-                      button-only
-                      size="sm"
-                      right
-                      locale="en-US"
-                      aria-controls="example-input"
-                      :disabled="isPrintQRCode"
-                    ></b-form-datepicker>
-                  </b-input-group-append>
-                </b-input-group>
+              <template v-slot:cell(lotDate)="data">
+                <date-picker
+                  v-model="data.item.lotDate"
+                  format="DD/MM/YYYY"
+                  placeholder="dd/mm/yyyy"
+                ></date-picker>
               </template>
-              <template v-slot:cell(productionDate)>
-                <b-input-group class="mb-3">
-                  <b-form-input
-                    v-model="date"
-                    type="text"
-                    size="sm"
-                    placeholder="YYYY-MM-DD"
-                    autocomplete="off"
-                    :disabled="isPrintQRCode"
-                  ></b-form-input>
-                  <b-input-group-append>
-                    <b-form-datepicker
-                      v-model="date"
-                      button-only
-                      size="sm"
-                      right
-                      locale="en-US"
-                      aria-controls="example-input"
-                    ></b-form-datepicker>
-                  </b-input-group-append>
-                </b-input-group>
+              <template v-slot:cell(productionDate)="data">
+                <date-picker
+                  v-model="data.item.productionDate"
+                  format="DD/MM/YYYY"
+                  placeholder="dd/mm/yyyy"
+                ></date-picker>
               </template>
-              <template v-slot:cell(expDate)>
-                <b-input-group class="mb-3">
-                  <b-form-input
-                    v-model="date"
-                    type="text"
-                    size="sm"
-                    placeholder="YYYY-MM-DD"
-                    autocomplete="off"
-                    :disabled="isPrintQRCode"
-                  ></b-form-input>
-                  <b-input-group-append>
-                    <b-form-datepicker
-                      v-model="date"
-                      button-only
-                      size="sm"
-                      right
-                      locale="en-US"
-                      aria-controls="example-input"
-                    ></b-form-datepicker>
-                  </b-input-group-append>
-                </b-input-group>
+              <template v-slot:cell(expDate)="data">
+                <date-picker
+                  v-model="data.item.expDate"
+                  format="DD/MM/YYYY"
+                  placeholder="dd/mm/yyyy"
+                ></date-picker>
               </template>
             </b-table>
           </div>
@@ -177,12 +149,16 @@
 </template>
 
 <script>
-import { getInbound } from '@/Api/inboundServices';
+import { getInbound } from "@/Api/inboundServices";
+import DatePicker from "vue2-datepicker";
+import "vue2-datepicker/index.css";
 
 export default {
+  components: { DatePicker },
   name: "Inbound",
   data() {
     return {
+      time1: null,
       date: "",
       searchInput: "",
       fields: [
@@ -192,18 +168,30 @@ export default {
         { key: "productionDate", label: "Ngày sản xuất" },
         { key: "expDate", label: "Ngày hết hạn" },
         { key: "printQRCode", label: "In QR Code" },
-        { key: "action", tdClass: 'text-center', label: "Thao tác" },
+        { key: "action", tdClass: "text-center", label: "Thao tác" },
       ],
       dataSource: [
-        { key: 1, doneQty: { success: 5, failed: 2 } },
-        { key: 2, doneQty: { success: 5, failed: 3 } }
+        {
+          key: 1,
+          doneQty: { done: 1, yet: 2 },
+          lotNumber: 3,
+          lotDate: "",
+          productionDate: "",
+          expDate: "",
+        },
+        {
+          key: 2,
+          doneQty: { done: 1, yet: 2 },
+          lotNumber: 3,
+        },
       ],
+
       headVariant: "light",
       inbound: {},
       isLoading: true,
       isPrintQRCode: false,
       isAddLot: false,
-      isDisplay: true
+      isDisplay: true,
     };
   },
   created() {
@@ -212,31 +200,34 @@ export default {
   methods: {
     displayInpSearch() {
       if (this.inbound.lines.length > 1) {
-        return 'd-block'
-      } else if(!this.isDisplay) {
-        return 'd-none';
+        return "d-block";
+      } else if (!this.isDisplay) {
+        return "d-none";
       }
     },
     getInboundById() {
       getInbound(this.$route.params.id)
-      .then(res => {
-        if (this.searchInput.length === 0) {
-          this.isLoading = false;
-          this.inbound = res.data;
-        } else {
-          this.inbound.lines = res.data.lines.filter(product => {
-            return product.name.toLowerCase().includes(this.searchInput.toLowerCase())
-          });
-        }
-      }).catch(err => {
-        console.log(`Error get List PO ${err}`)
-      });
+        .then((res) => {
+          if (this.searchInput.length === 0) {
+            this.isLoading = false;
+            this.inbound = res.data;
+          } else {
+            this.inbound.lines = res.data.lines.filter((product) => {
+              return product.name
+                .toLowerCase()
+                .includes(this.searchInput.toLowerCase());
+            });
+          }
+        })
+        .catch((err) => {
+          console.log(`Error get List PO ${err}`);
+        });
     },
     handleAdd() {
       if (this.dataSource.length < 3) {
         const newData = {
           key: this.dataSource.length + 1,
-          doneQty: this.dataSource.length + 2
+          doneQty: this.dataSource.length + 2,
         };
         this.dataSource = [...this.dataSource, newData];
 
@@ -258,7 +249,7 @@ export default {
       // TODO: Need Implement action print QR Code
       this.isPrintQRCode = true;
     },
-  }
+  },
 };
 </script>
 
@@ -299,7 +290,7 @@ export default {
 
 .input-search {
   border-radius: 35px;
-  border: 1px solid  #919aa3;
+  border: 1px solid #919aa3;
   border-radius: 35px !important;
   padding: 0.5em 1em 0.5em 2.5em;
   width: 30%;
@@ -342,7 +333,7 @@ export default {
 }
 
 .img-product {
-  transition: transform .2s;
+  transition: transform 0.2s;
   margin: 0 auto;
 }
 .img-product:hover {
