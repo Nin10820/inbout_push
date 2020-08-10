@@ -30,18 +30,17 @@
 
       <div class="container-fluid">
         <div class="form-group px-5 form-inline">
-          <div class="my-3 px-3 position-relative">
+          <div class="my-3 px-3 position-relative" :class="displayInpSearch()" v-if="isDisplay">
             <i class="fas fa-search text-muted position-icon"></i>
-            <input type="search" class="input-search" placeholder="Nhập tên thuốc cần tìm..." v-model="searchInput" @keyup="getPODetailById" />
+            <input type="search" class="input-search" placeholder="Nhập tên thuốc cần tìm..." v-model="searchInput" @keyup="getInboundById" />
           </div>
-          <button type="button" class="btn btn-primary ml-auto">Hoàn tất</button>
+          <b-button variant="primary ml-auto">Hoàn tất</b-button>
         </div>
       </div>
 
       <div class="container-fluid bg-light">
         <div class="px-5">
           <div class="list" v-for="product in inbound.lines" :key="product.id">
-            {{ product }}
             <div class="list-info py-2">
               <div class="list-info__id p-5">{{ product.id }}</div>
               <div class="list-info__image justify-content-center d-flex px-2">
@@ -178,7 +177,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import { getInbound } from '@/Api/inboundServices';
 
 export default {
   name: "Inbound",
@@ -195,46 +194,39 @@ export default {
         { key: "printQRCode", label: "In QR Code" },
         { key: "action", tdClass: 'text-center', label: "Thao tác" },
       ],
-
       dataSource: [
-      {
-        key: 1,
-        done_qty: 1
-      },
-      {
-        key: 2,
-        done_qty: 2
-      },
-    ],
-
+        { key: 1, doneQty: { success: 5, failed: 2 } },
+        { key: 2, doneQty: { success: 5, failed: 3 } }
+      ],
       headVariant: "light",
       inbound: {},
       isLoading: true,
       isPrintQRCode: false,
-      isAddLot: false
+      isAddLot: false,
+      isDisplay: true
     };
   },
   created() {
-    this.getPODetailById();
+    this.getInboundById();
   },
   methods: {
-    getPODetailById() {
-      return axios.get(`https://cors-anywhere.herokuapp.com/https://erp.stg.thuocsi.vn/api/v1/receipts/${this.$route.params.id}`,
-                  { headers:
-                    {
-                      "api-key": "1fce20616fd2500d63b980b6f37ea8c288378604f47e282ff8644fc5529ebb75",
-                      "Access-Control-Allow-Origin": "*"
-                    }
-                  })
+    displayInpSearch() {
+      if (this.inbound.lines.length > 1) {
+        return 'd-block'
+      } else if(!this.isDisplay) {
+        return 'd-none';
+      }
+    },
+    getInboundById() {
+      getInbound(this.$route.params.id)
       .then(res => {
         if (this.searchInput.length === 0) {
-          this.inbound = res.data;
           this.isLoading = false;
+          this.inbound = res.data;
         } else {
-          console.log(this.inbound)
-          this.inbound = res.data.lines.filter(product => {
-            product.name.toLowerCase().includes(this.searchInput.toLowerCase())
-          })
+          this.inbound.lines = res.data.lines.filter(product => {
+            return product.name.toLowerCase().includes(this.searchInput.toLowerCase())
+          });
         }
       }).catch(err => {
         console.log(`Error get List PO ${err}`)

@@ -1,9 +1,9 @@
 import Api from './index';
 
-export const getListInbound = () => {
+export const getInbounds = () => {
   return Api.get('/receipts');
 }
 
-export const getDetailInbound = (id) => {
+export const getInbound = (id) => {
   return Api.get(`/receipts/${id}`)
 }
