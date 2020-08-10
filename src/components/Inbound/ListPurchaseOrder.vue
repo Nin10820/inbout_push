@@ -31,7 +31,7 @@
       <template v-slot:cell(id)="data">
         <router-link :to="{ name: 'Detail', params: { id: data.value }}">{{ data.value }}</router-link>
       </template>
-    </b-table>  
+    </b-table>
 
     <b-pagination
       v-model="currentPage"
@@ -47,6 +47,8 @@
 import axios from "axios";
 import SearchPurchaseOrder from '@/components/Inbound/SearchPurchaseOrder'
 // import { getListInbound } from "../../Api/inboundServices";
+
+const poListURL = "https://cors-anywhere.herokuapp.com/https://erp.stg.thuocsi.vn/api/v1/receipts";
 
 export default {
   name: "ListPurchaseOrder",
@@ -76,29 +78,33 @@ export default {
       if (textSearchInput !== "" || textSearchInput.length !== 0) {
         this.purchaseOrderData = await this.purchaseOrderData.filter(data =>
         {
-          return data.ref.toLowerCase().includes(textSearchInput.toLowerCase());
+          return data.ref.toLowerCase().includes(textSearchInput.toLowerCase()) || String(data.id).includes(textSearchInput) || data.partner.toLowerCase().includes(textSearchInput.toLowerCase());
         });
-        return this.purchaseOrderData;
       } else {
-        this.purchaseOrderData = await axios.get("https://cors-anywhere.herokuapp.com/https://erp.stg.thuocsi.vn/api/v1/receipts",
+        this.isLoading = true;
+
+        return await axios.get(poListURL,
                 { headers:
                   {
                     "api-key": "1fce20616fd2500d63b980b6f37ea8c288378604f47e282ff8644fc5529ebb75"
                   }
         })
-        .then(res => this.purchaseOrderData = res.data)
+        .then(res => {
+          this.purchaseOrderData = res.data;
+          this.isLoading = false;
+        })
         .catch(err => {
           console.log(`Error get List PO ${err}`)
         });
-        return this.purchaseOrderData;
       }
     }
   },
   mounted() {
-    axios.get("https://cors-anywhere.herokuapp.com/https://erp.stg.thuocsi.vn/api/v1/receipts",
+    axios.get(poListURL,
                 { headers:
                   {
-                    "api-key": "1fce20616fd2500d63b980b6f37ea8c288378604f47e282ff8644fc5529ebb75"
+                    "api-key": "1fce20616fd2500d63b980b6f37ea8c288378604f47e282ff8644fc5529ebb75",
+                    "Access-Control-Allow-Origin": "*"
                   }
                 })
     .then(res => {
