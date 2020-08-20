@@ -28,19 +28,6 @@
 
       <div class="container-fluid">
         <div class="form-group px-5 form-inline">
-          <div class="my-3 px-3 position-relative" :class="displayInpSearch()" v-if="isDisplay">
-            <i class="fas fa-search text-muted position-icon"></i>
-            <b-input-group class="mb-3">
-              <b-form-input
-                type="search"
-                class="input-search"
-                placeholder="Nhập tên thuốc cần tìm..."
-                v-model="searchInput"
-                @keyup="getInboundById"
-              ></b-form-input>
-              <i class="fas fa-search text-muted position-icon"></i>
-            </b-input-group>
-          </div>
           <b-button variant="primary ml-auto">Hoàn tất</b-button>
         </div>
       </div>
